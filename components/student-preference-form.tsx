@@ -39,13 +39,12 @@ export function StudentPreferenceForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Here you would typically send the data to a server
     console.log('Form submitted:', formData)
     toast({
       title: "Preferences Submitted",
       description: "Your seating preferences have been recorded.",
     })
-    setFormData(initialFormData) // Reset form after submission
+    setFormData(initialFormData)
   }
 
   return (
@@ -84,7 +83,7 @@ export function StudentPreferenceForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="preferredPartner">Preferred Seating Partner (Optional)</Label>
+            <Label htmlFor="preferredPartner">Who would you like to sit with?</Label>
             <Input
               id="preferredPartner"
               name="preferredPartner"
@@ -94,7 +93,7 @@ export function StudentPreferenceForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="nonPreferredPartner">Non-Preferred Seating Partner (Optional)</Label>
+            <Label htmlFor="nonPreferredPartner">Who would you not like to sit with?</Label>
             <Input
               id="nonPreferredPartner"
               name="nonPreferredPartner"

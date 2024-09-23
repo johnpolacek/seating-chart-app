@@ -24,7 +24,7 @@ export function ClassroomLayoutAdvanced() {
   const [classPeriods, setClassPeriods] = useState<ClassPeriod[]>(initialClassPeriods)
   const [currentPeriodIndex, setCurrentPeriodIndex] = useState<number | null>(0)
   const [newStudentName, setNewStudentName] = useState('')
-  const [newPeriodName, setNewPeriodName] = useState('')
+  const [newPeriodNumber, setNewPeriodNumber] = useState<number | null>(null)
   const [selectedRowForNewPod, setSelectedRowForNewPod] = useState<number | null>(null)
   const [isAddingNewPeriod, setIsAddingNewPeriod] = useState<boolean>(false)
 
@@ -154,20 +154,20 @@ export function ClassroomLayoutAdvanced() {
     )
   }
 
-  // Add a new period to the classPeriods array
   const addNewPeriod = () => {
-    if (newPeriodName.trim()) {
+    if (newPeriodNumber !== null && !classPeriods.some(period => period.number === newPeriodNumber)) {
       const newPeriod: ClassPeriod = {
-        number: classPeriods.length + 1,
+        number: newPeriodNumber,
         rows: [{ pods: [{ students: [] }] }],
         unassignedStudents: [],
       }
       setClassPeriods(current => [...current, newPeriod])
-      setNewPeriodName('')
+      setNewPeriodNumber(null)
       setIsAddingNewPeriod(false)
       setCurrentPeriodIndex(classPeriods.length) // Select the newly added period
     }
   }
+  
 
   // Handle selection changes in the period dropdown
   const handleSelectChange = (value: string) => {
@@ -261,18 +261,30 @@ export function ClassroomLayoutAdvanced() {
 
       {isAddingNewPeriod && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 w-full max-w-2xl">
-            <Input 
-              type="text" 
-              placeholder="Period Number" 
-              value={newPeriodName} 
-              onChange={(e) => setNewPeriodName(e.target.value)}
-              className="flex-grow"
-            />
+            <Select 
+              value={newPeriodNumber !== null ? newPeriodNumber.toString() : ''} 
+              onValueChange={(value) => setNewPeriodNumber(Number(value))}
+            >
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Select Period" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(number => (
+                  <SelectItem 
+                    key={number} 
+                    value={number.toString()}
+                    disabled={classPeriods.some(period => period.number === number)}
+                  >
+                    {number}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button onClick={addNewPeriod}>Add Period</Button>
             <Button 
               onClick={() => { 
                 setIsAddingNewPeriod(false)
-                setNewPeriodName('')
+                setNewPeriodNumber(null)
                 setCurrentPeriodIndex(0)
               }} 
               variant="ghost"
@@ -313,7 +325,6 @@ export function ClassroomLayoutAdvanced() {
             </Button>
           </div>
           
-          {/* Rendering Rows and Pods */}
           {currentPeriod.rows.map((row, rowIdx) => (
             <div key={rowIdx} className="mb-4">
               <h2 className="text-xl font-semibold mb-2">Row {rowIdx + 1}</h2>
@@ -322,8 +333,7 @@ export function ClassroomLayoutAdvanced() {
               </div>
             </div>
           ))}
-          
-          {/* Unassigned Students */}
+
           <Card className="p-4 mt-4">
             <CardContent>
               <h2 className="text-lg font-semibold mb-2">Unassigned Students</h2>
